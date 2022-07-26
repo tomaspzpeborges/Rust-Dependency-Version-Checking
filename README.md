@@ -3,12 +3,12 @@
 
 This project uses a new command line tool to update a dependency tree of a Rust project.
 
-How to use: 
+## How to use: 
 
 python3 script.py -a parsec -c parsec-tool
 
 
-About the functionality:
+## About the functionality:
 
 This tool takes two mandatory command line arguments, -a (anchor project) and -c (comparable project). We assumed that one of the projects will take precedence over the other, and then we only update the preferences of the second one. Then, the script looks for the two projects and checks if they are written in rust. If so, we get the dependency trees by running cargo tree. 
 
