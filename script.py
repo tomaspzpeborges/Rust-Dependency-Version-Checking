@@ -42,7 +42,16 @@ def run_cargo_build(project):
         os.chdir(base_path.parent)
         return None
 
+def run_cargo_update(dep_dict, project):
 
+    os.chdir(project)
+
+    for item in dep_dict:
+        print(item)
+        subprocess.run(["cargo update -p "+item+" --precise "+dep_dict[item]], shell=True)
+    
+    os.chdir(base_path.parent)
+    return None
 
 def main():
 
@@ -53,15 +62,22 @@ def main():
     parser = argparse.ArgumentParser(usage='%(prog)s [options]')
     parser.add_argument('-a', help = "the anchor project; will not be updated")
     parser.add_argument('-c', help = "the project to be compared; will be updated according to the dependencies of the anchor project")
-    parser.add_argument('-b', help = "runs cargo build on the updated project", required = False)
+    parser.add_argument('-b', '--build', help = "runs cargo build on the updated project", required = False)
 
     args = parser.parse_args()
 
     A_tree = run_cargo_tree(args.a)
     B_tree = run_cargo_tree(args.c)
 
-    if args.b:
+    if args.build:
         run_cargo_build(args.c)
+
+    #dictionary = {"ahash": "0.7.5" , "aho-corasick" : "0.7.17" , "anyhow" : "1.0.57"}
+    run_cargo_update(dictionary, args.c)
+
+    print("new tree: ")
+
+    new_tree = run_cargo_tree(args.c)
 
 
 if __name__ == "__main__":
