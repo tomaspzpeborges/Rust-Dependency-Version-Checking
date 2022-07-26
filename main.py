@@ -391,5 +391,5 @@ parsec-service v1.0.0 (/home/ubuntu/parsec)
     print(hmap)
     tree.bfs_hash_it(hmap)
     tree2.bfs_update(hmap)
-    print(str(tree2))
-
+    #print(str(tree2))
+    print(*tree.to_ascii(tree.root, -1))
