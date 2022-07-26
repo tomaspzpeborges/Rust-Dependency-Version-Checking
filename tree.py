@@ -44,12 +44,15 @@ class Tree:
         stripped_output = stripped_output.strip() 
         tree_body = stripped_output.split("\n") 
         ptr = None
+        kinds = []
         for line in tree_body:
             line = line.rstrip()
             dep = line.lstrip().split(" ")        
             depth = Tree.get_depth(line)
 
-            if len(dep) > 1:
+            if len(dep) == 1:
+                kinds.append((depth, dep[0]))
+            else:
                 package_name, version, *tags = dep
                 node = Node(package_name, version, tags, "", [], depth)                
                 if not self.root:
@@ -71,8 +74,39 @@ class Tree:
                         node.parent = ptr.parent
                         ptr.parent.children.append(node)
                         ptr = node
+                if kinds:
+                    curr_kind = kinds[-1]
+                    if node.depth > curr_kind[0]:
+                        node.tags.append(curr_kind[1])
+                    else:
+                        kinds.pop(-1)
+                    
+
     def __str__(self):
         return str(self.root)
+    
+    @classmethod
+    def to_ascii(cls, node, curr_id, prefix = ""):
+        def format_tree(node, curr_id, prefix = "", ls = []):
+            connector = "└── " 
+            if node.depth != 0:
+                if node != node.parent.children[-1]:
+                    connector = "├── "
+            st = f"{prefix}{connector}"
+            st += repr(node)
+            ls.append(st + "\n")
+            children = node.children
+            for child in children:
+                new_prefix = prefix
+                if node.depth != 0:
+                    if node == node.parent.children[-1]:
+                        new_prefix += "    "
+                    else:
+                        new_prefix += "│   "
+                format_tree(child, curr_id, new_prefix, ls)
+            return ls
+        tree = format_tree(node, curr_id, "", [])
+        return tree
     
 
 if __name__ == "__main__":
@@ -273,4 +307,6 @@ parsec-service v1.0.0 (/home/ubuntu/parsec)
 
     tree = Tree()
     tree.build_from_cargo(test)
-    print(str(tree))
+    # print(str(tree))
+
+    print(*tree.to_ascii(tree.root, -1))
