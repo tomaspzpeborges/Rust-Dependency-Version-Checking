@@ -9,12 +9,10 @@ def run_cargo_tree(project):
 
     os.chdir(project)
     is_rust = False
-    #print("looking in: "+project)
+    print("looking in: "+project)
 
-    #for file in os.listdir(project):
     if glob.glob('Cargo.toml'):
         is_rust = True
-    #print("is rust? "+str(is_rust))
     
     if is_rust:
         tree = subprocess.check_output(["cargo tree"],shell=True)
@@ -47,11 +45,8 @@ def run_cargo_update(dep_dict, project):
 
     os.chdir(project)
 
-    #print("dict: "+ str(dep_dict))
-
     for item in dep_dict:
         
-        #print(item)
         subprocess.run(["cargo update -q -p "+item+" --precise "+dep_dict[item]], shell=True)
     
     os.chdir(base_path.parent)
@@ -59,48 +54,34 @@ def run_cargo_update(dep_dict, project):
 
 def main():
 
-    print(base_path.parent)
-
     os.chdir(base_path.parent)
 
     parser = argparse.ArgumentParser(usage='%(prog)s [options]')
     parser.add_argument('-a', help = "the anchor project; will not be updated")
     parser.add_argument('-c', help = "the project to be compared; will be updated according to the dependencies of the anchor project")
-    parser.add_argument('-b', '--build', help = "runs cargo build on the updated project", required = False)
+    #parser.add_argument('-b', '--build', help = "runs cargo build on the updated project", required = False)
 
     args = parser.parse_args()
 
     A_tree = run_cargo_tree(args.a)
     B_tree = run_cargo_tree(args.c)
 
-    #print("A TREE: \n"+str(A_tree))
 
     a_tree = Tree(str(A_tree))
     b_tree = Tree(str(B_tree))
     hmap = {}
     a_tree.bfs_hash_it(hmap)
-    #print(hmap)
-    #print()
     newhmap = {}
     b_tree.bfs_update(hmap, newhmap)
-    #print(str(tree2))
     
-    #print(newhmap)
-    #print(*tree.to_ascii(tree.root, -1))
 
+    #if args.build:
+    #    run_cargo_build(args.c)
 
-    if args.build:
-        run_cargo_build(args.c)
-
-    #dictionary = {"ahash": "0.7.5" , "aho-corasick" : "0.7.17" , "anyhow" : "1.0.57", "ansi_term" : "3.12.1"}
     run_cargo_update(newhmap, args.c)
-    #run_cargo_update(dictionary, args.c)
-
-    #print("new tree: ")
 
     new_tree = run_cargo_tree(args.c)
 
-    #print(str(new_tree))
     print(*b_tree.to_ascii(b_tree.root, -1))
 
 

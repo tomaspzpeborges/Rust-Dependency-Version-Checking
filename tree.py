@@ -12,7 +12,7 @@ class Node:
         self.parent = parent
         self.children = []
         self.depth = depth
-        self.previous = None # TO BE ADDED
+        self.previous = None 
 
     def __str__(self, level = 0):
         str_rep = "\t" * level + f"{self.package} {self.version} {self.tags}" + "\n"
@@ -139,7 +139,6 @@ class Tree:
                 if node != node.parent.children[-1]:
                     connector = "├── "
             st = f"{prefix}{connector}"
-           # st += repr(node)
             if(node.previous):
                 st += Tree.COLOURS["GREEN"] +"+"+ repr(node) + Tree.COLOURS["ENDC"] + "\n"
                 prev_st = repr(node).split(" ")
