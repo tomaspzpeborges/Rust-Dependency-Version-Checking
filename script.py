@@ -9,7 +9,7 @@ def run_cargo_tree(project):
 
     os.chdir(project)
     is_rust = False
-    print("looking in: "+project)
+    #print("looking in: "+project)
 
     #for file in os.listdir(project):
     if glob.glob('Cargo.toml'):
@@ -17,9 +17,9 @@ def run_cargo_tree(project):
     #print("is rust? "+str(is_rust))
     
     if is_rust:
-        tree = subprocess.run(["cargo tree -q"],shell=True)
+        tree = subprocess.check_output(["cargo tree"],shell=True)
         os.chdir(base_path.parent)
-        return tree
+        return tree.decode('utf-8')
     else:
         print("project {} is not written in rust".format(project))
         os.chdir(base_path.parent)
@@ -47,9 +47,12 @@ def run_cargo_update(dep_dict, project):
 
     os.chdir(project)
 
+    #print("dict: "+ str(dep_dict))
+
     for item in dep_dict:
-        print(item)
-        subprocess.run(["cargo update -p "+item+" --precise "+dep_dict[item]], shell=True)
+        
+        #print(item)
+        subprocess.run(["cargo update -q -p "+item+" --precise "+dep_dict[item]], shell=True)
     
     os.chdir(base_path.parent)
     return None
@@ -70,6 +73,8 @@ def main():
     A_tree = run_cargo_tree(args.a)
     B_tree = run_cargo_tree(args.c)
 
+    #print("A TREE: \n"+str(A_tree))
+
     a_tree = Tree(str(A_tree))
     b_tree = Tree(str(B_tree))
     hmap = {}
@@ -80,19 +85,23 @@ def main():
     b_tree.bfs_update(hmap, newhmap)
     #print(str(tree2))
     
-    print(newhmap)
+    #print(newhmap)
     #print(*tree.to_ascii(tree.root, -1))
 
 
     if args.build:
         run_cargo_build(args.c)
 
-    #dictionary = {"ahash": "0.7.5" , "aho-corasick" : "0.7.17" , "anyhow" : "1.0.57"}
+    #dictionary = {"ahash": "0.7.5" , "aho-corasick" : "0.7.17" , "anyhow" : "1.0.57", "ansi_term" : "3.12.1"}
     run_cargo_update(newhmap, args.c)
+    #run_cargo_update(dictionary, args.c)
 
-    print("new tree: ")
+    #print("new tree: ")
 
     new_tree = run_cargo_tree(args.c)
+
+    #print(str(new_tree))
+    print(*b_tree.to_ascii(b_tree.root, -1))
 
 
 if __name__ == "__main__":
