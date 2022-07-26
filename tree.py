@@ -2,6 +2,8 @@ from re import sub
 
 from packaging import version
 
+
+
 class Node:
     def __init__(self, package, version, tags, parent, children, depth):
         self.package = package
@@ -24,6 +26,13 @@ class Node:
 
 
 class Tree:
+
+    COLOURS = {
+        "GREEN" :'\033[92m',
+        "RED" : '\033[91m',
+        "ENDC" : '\033[0m'
+    }
+
     def __init__(self, cargo_raw, project = None, root = None):
         self.project = project
         self.root = root
@@ -125,12 +134,19 @@ class Tree:
     @classmethod
     def to_ascii(cls, node, curr_id, prefix = ""):
         def format_tree(node, curr_id, prefix = "", ls = []):
-            connector = "└── " 
+            connector = "└── "
             if node.depth != 0:
                 if node != node.parent.children[-1]:
                     connector = "├── "
             st = f"{prefix}{connector}"
-            st += repr(node)
+           # st += repr(node)
+            if(node.previous):
+                st += Tree.COLOURS["GREEN"] +"+"+ repr(node) + Tree.COLOURS["ENDC"] + "\n"
+                prev_st = repr(node).split(" ")
+                prev_st[1] = node.previous
+                st += " " + f"{prefix}" + Tree.COLOURS["RED"] + "".rjust(4) + "-"+f"{node.package} {node.previous} {node.tags}"+ Tree.COLOURS["ENDC"]
+            else:
+                st += repr(node)
             ls.append(st + "\n")
             children = node.children
             for child in children:
@@ -144,4 +160,10 @@ class Tree:
             return ls
         tree = format_tree(node, curr_id, "", [])
         return tree
-    
+
+
+
+
+
+
+

@@ -396,4 +396,4 @@ parsec-service v1.0.0 (/home/ubuntu/parsec)
     #print(str(tree2))
     
     print(newhmap)
-    #print(*tree.to_ascii(tree.root, -1))
+    print(*tree2.to_ascii(tree2.root, -1))
