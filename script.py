@@ -13,12 +13,30 @@ def run_cargo_tree(project):
     #for file in os.listdir(project):
     if glob.glob('Cargo.toml'):
         is_rust = True
-    print("is rust? "+str(is_rust))
+    #print("is rust? "+str(is_rust))
     
     if is_rust:
-        tree = subprocess.run(["cargo tree"],shell=True)
+        tree = subprocess.run(["cargo tree -q"],shell=True)
         os.chdir(base_path.parent)
         return tree
+    else:
+        print("project {} is not written in rust".format(project))
+        os.chdir(base_path.parent)
+        return None
+
+
+def run_cargo_build(project):
+
+    os.chdir(project)
+    is_rust = False
+
+    if glob.glob('Cargo.toml'):
+        is_rust = True
+
+    if is_rust:
+        build = subprocess.run(["cargo build"],shell=True)
+        os.chdir(base_path.parent)
+        return build
     else:
         print("project {} is not written in rust".format(project))
         os.chdir(base_path.parent)
@@ -32,17 +50,19 @@ def main():
 
     os.chdir(base_path.parent)
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('anchor_project_path', help = "the anchor project; will not be updated")
-    parser.add_argument('comparable_project_path', help = "the project to be compared; will be updated according to the dependencies of the anchor project")
+    parser = argparse.ArgumentParser(usage='%(prog)s [options]')
+    parser.add_argument('-a', help = "the anchor project; will not be updated")
+    parser.add_argument('-c', help = "the project to be compared; will be updated according to the dependencies of the anchor project")
+    parser.add_argument('-b', help = "runs cargo build on the updated project", required = False)
 
     args = parser.parse_args()
 
-    A_tree = run_cargo_tree(args.anchor_project_path)
-    B_tree = run_cargo_tree(args.comparable_project_path)
+    A_tree = run_cargo_tree(args.a)
+    B_tree = run_cargo_tree(args.c)
 
-    #print("first tree: "+A_tree)
-    #print("second tree: "+B_tree)
+    if args.b:
+        run_cargo_build(args.c)
+
 
 if __name__ == "__main__":
     main()
