@@ -1,4 +1,5 @@
 import subprocess, os, sys, argparse, pathlib, glob
+from tree import Tree
 
 
 base_path = pathlib.Path(__file__).parent.resolve()
@@ -69,11 +70,25 @@ def main():
     A_tree = run_cargo_tree(args.a)
     B_tree = run_cargo_tree(args.c)
 
+    a_tree = Tree(str(A_tree))
+    b_tree = Tree(str(B_tree))
+    hmap = {}
+    a_tree.bfs_hash_it(hmap)
+    #print(hmap)
+    #print()
+    newhmap = {}
+    b_tree.bfs_update(hmap, newhmap)
+    #print(str(tree2))
+    
+    print(newhmap)
+    #print(*tree.to_ascii(tree.root, -1))
+
+
     if args.build:
         run_cargo_build(args.c)
 
     #dictionary = {"ahash": "0.7.5" , "aho-corasick" : "0.7.17" , "anyhow" : "1.0.57"}
-    run_cargo_update(dictionary, args.c)
+    run_cargo_update(newhmap, args.c)
 
     print("new tree: ")
 
