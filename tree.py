@@ -21,22 +21,6 @@ class Node:
     def __repr__(self):
         return f"{self.package} {self.version} {self.tags}"
 
-    '''
-    def hash_it(self, hmap={}):
-        if not self.children:
-            return []
-        children = self.children[:]
-        for child in children:
-            package_name = child.package
-            version = child.version
-            if package_name not in hmap:
-                hmap[package_name] = version
-                res = child.hash_it(hmap)
-                if res:
-                    children += res[0]
-        return (children, hmap)
-    '''
-
 
 
 class Tree:
@@ -46,31 +30,28 @@ class Tree:
         self.size = 0
         self.build_from_cargo(cargo_raw)
 
-    def bfs_basic(self):
-        queue = [self.root]
-        while queue:
-            p = queue.pop(0)
-            children = p.children 
-            if children:
-                for child in children:
-                    queue.append(child)
-
     def bfs_hash_it(self, hmap):
         queue = [self.root]
         while queue:
             p = queue.pop(0)
             package_name = p.package
-            version = p.version
+            p_version = p.version
             depth = p.depth
+
             if package_name not in hmap and depth != 0:
-                hmap[package_name] = version
+                hmap[package_name] = p_version
+
+            if package_name in hmap:
+                h_version = hmap[package_name] #tie breaker is highest package
+                if version.parse(p_version) > version.parse(h_version):
+                    hmap[package_name]=p_version
             children = p.children 
             if children:
                 for child in children:
                     queue.append(child)
 
 
-    def bfs_update(self, hmap):
+    def bfs_update(self, hmap, newhmap):
         queue = [self.root]
         while queue:
             p = queue.pop(0)
@@ -78,9 +59,12 @@ class Tree:
             current_version = p.version
             if package_name in hmap:
                 anchor_version = hmap[package_name]
-                if version.parse(str(anchor_version)) > version.parse(current_version):
+                if version.parse(anchor_version) > version.parse(current_version):
                     p.version= anchor_version
                     p.previous = current_version
+                    if package_name not in newhmap:
+                        newhmap[package_name] =anchor_version
+
             children = p.children 
             if children:
                 for child in children:

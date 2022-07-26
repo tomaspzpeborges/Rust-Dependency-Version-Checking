@@ -383,13 +383,17 @@ parsec-service v1.0.0 (/home/ubuntu/parsec)
         ├── heck v0.3.3 (*)
         ├── proc-macro2 v1.0.36 (*)
         ├── quote v1.0.15 (*)
-        └── syn v1.0.88 (*)
+        └── syn v0.0.88 (*)
 """
     tree = Tree(test)
     tree2 = Tree(test2)
     hmap = {}
-    print(hmap)
     tree.bfs_hash_it(hmap)
-    tree2.bfs_update(hmap)
+    print(hmap)
+    print()
+    newhmap = {}
+    tree2.bfs_update(hmap, newhmap)
     #print(str(tree2))
-    print(*tree.to_ascii(tree.root, -1))
+    
+    print(newhmap)
+    #print(*tree.to_ascii(tree.root, -1))
