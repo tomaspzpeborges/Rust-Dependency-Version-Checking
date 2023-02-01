@@ -2,7 +2,7 @@
 
 
 This project uses a new command line tool to update a dependency tree of a Rust project.
-Developed for the 8-hour World's ARM Interns Hackathon 2022. This project achieved 2nd place in best execution.
+Developed for the 8-hour World's ARM Interns Hackathon 2022. This project achieved 2nd place in the Best Execution category.
 
 ## How to use: 
 
